@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Tasks - To-Do App</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f5fb;color:#25243a}
+.container{max-width:650px;margin:65px auto;padding:28px;background:white;border-radius:18px;box-shadow:0 10px 35px #20204012}
+h1{margin:0 0 8px;font-size:30px}
+.subtitle{color:#88869b;margin-bottom:28px}
+.form{display:flex;gap:10px}
+input{min-width:0;flex:1;padding:14px;border:1px solid #dddbea;border-radius:9px;font-size:15px;outline-color:#7662e8}
+button{border:0;border-radius:9px;padding:12px 17px;background:#7662e8;color:white;font-weight:bold;cursor:pointer}
+button:hover{opacity:.85}
+.stats{display:flex;gap:12px;margin:22px 0}
+.stat{flex:1;padding:14px;background:#f5f3ff;border-radius:10px;text-align:center}
+.stat strong{display:block;font-size:23px;color:#7662e8}
+.stat span{font-size:12px;color:#777}
+.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filters button{background:#f1eff8;color:#69657b}
+.filters button.active{background:#7662e8;color:white}
+ul{padding:0;margin:0;list-style:none}
+li{display:flex;align-items:center;gap:12px;padding:15px 4px;border-bottom:1px solid #eee}
+li input{flex:none;width:18px;height:18px;accent-color:#7662e8}
+.task{flex:1;overflow-wrap:anywhere}
+.done .task{text-decoration:line-through;color:#aaa}
+.delete{background:#fff0f0;color:#db5151;padding:9px 11px}
+.empty{text-align:center;padding:30px;color:#aaa}
+.footer{margin-top:20px;color:#999;font-size:12px;text-align:center}
+@media(max-width:600px){.container{margin:20px 12px;padding:20px}.stats{gap:6px}.stat{padding:10px 4px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>My Tasks ✨</h1>
+  <div class="subtitle">Organize your day, one task at a time.</div>
+
+  <form class="form" id="taskForm">
+    <input id="taskInput" placeholder="What needs to be done?" maxlength="200" required>
+    <button type="submit">+ Add Task</button>
+  </form>
+
+  <div class="stats">
+    <div class="stat"><strong id="total">0</strong><span>Total Tasks</span></div>
+    <div class="stat"><strong id="pending">0</strong><span>Pending</span></div>
+    <div class="stat"><strong id="completed">0</strong><span>Completed</span></div>
+  </div>
+
+  <div class="filters">
+    <button type="button" class="active" data-filter="all">All Tasks</button>
+    <button type="button" data-filter="pending">Pending</button>
+    <button type="button" data-filter="completed">Completed</button>
+  </div>
+
+  <ul id="taskList"></ul>
+  <div class="footer">Stay focused. You've got this! 💜</div>
+</div>
+
+<script>
+const form=document.getElementById('taskForm');
+const input=document.getElementById('taskInput');
+const list=document.getElementById('taskList');
+let tasks=JSON.parse(localStorage.getItem('myTasks')||'[]');
+let filter='all';
+
+function render(){
+  list.replaceChildren();
+  const visible=tasks.filter(t=>filter==='all'||(filter==='completed'?t.done:!t.done));
+  if(!visible.length){
+    const empty=document.createElement('li');
+    empty.className='empty';
+    empty.textContent=tasks.length?'No tasks in this filter.':'No tasks yet. Add your first task!';
+    list.append(empty);
+  }
+  visible.forEach(t=>{
+    const li=document.createElement('li');
+    if(t.done)li.className='done';
+    const check=document.createElement('input');
+    check.type='checkbox';check.checked=t.done;
+    check.setAttribute('aria-label','Mark task complete');
+    check.addEventListener('change',()=>{
+      t.done=check.checked;save();
+    });
+    const text=document.createElement('span');
+    text.className='task';text.textContent=t.text;
+    const del=document.createElement('button');
+    del.className='delete';del.textContent='Delete';
+    del.addEventListener('click',()=>{
+      tasks=tasks.filter(x=>x.id!==t.id);save();
+    });
+    li.append(check,text,del);list.append(li);
+  });
+  document.getElementById('total').textContent=tasks.length;
+  document.getElementById('pending').textContent=tasks.filter(t=>!t.done).length;
+  document.getElementById('completed').textContent=tasks.filter(t=>t.done).length;
+  document.querySelectorAll('[data-filter]').forEach(b=>{
+    b.classList.toggle('active',b.dataset.filter===filter);
+  });
+}
+function save(){
+  localStorage.setItem('myTasks',JSON.stringify(tasks));render();
+}
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const text=input.value.trim();
+  if(!text)return;
+  tasks.push({id:Date.now()+Math.random(),text,done:false});
+  input.value='';save();input.focus();
+});
+document.querySelectorAll('[data-filter]').forEach(b=>{
+  b.addEventListener('click',()=>{filter=b.dataset.filter;render();});
+});
+render();
+</script>
+</body>
+</html>
