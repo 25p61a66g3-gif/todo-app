@@ -4,115 +4,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Tasks - To-Do App</title>
+<title>My Tasks</title>
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f4f5fb;color:#25243a}
-.container{max-width:650px;margin:65px auto;padding:28px;background:white;border-radius:18px;box-shadow:0 10px 35px #20204012}
-h1{margin:0 0 8px;font-size:30px}
-.subtitle{color:#88869b;margin-bottom:28px}
-.form{display:flex;gap:10px}
-input{min-width:0;flex:1;padding:14px;border:1px solid #dddbea;border-radius:9px;font-size:15px;outline-color:#7662e8}
-button{border:0;border-radius:9px;padding:12px 17px;background:#7662e8;color:white;font-weight:bold;cursor:pointer}
-button:hover{opacity:.85}
-.stats{display:flex;gap:12px;margin:22px 0}
-.stat{flex:1;padding:14px;background:#f5f3ff;border-radius:10px;text-align:center}
-.stat strong{display:block;font-size:23px;color:#7662e8}
-.stat span{font-size:12px;color:#777}
-.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
-.filters button{background:#f1eff8;color:#69657b}
-.filters button.active{background:#7662e8;color:white}
-ul{padding:0;margin:0;list-style:none}
-li{display:flex;align-items:center;gap:12px;padding:15px 4px;border-bottom:1px solid #eee}
-li input{flex:none;width:18px;height:18px;accent-color:#7662e8}
-.task{flex:1;overflow-wrap:anywhere}
-.done .task{text-decoration:line-through;color:#aaa}
-.delete{background:#fff0f0;color:#db5151;padding:9px 11px}
-.empty{text-align:center;padding:30px;color:#aaa}
-.footer{margin-top:20px;color:#999;font-size:12px;text-align:center}
-@media(max-width:600px){.container{margin:20px 12px;padding:20px}.stats{gap:6px}.stat{padding:10px 4px}}
+body{margin:0;background:#f7f7fc;color:#25283d;font-family:Arial,Helvetica,sans-serif;min-height:100vh}
+.page{width:min(666px,calc(100% - 32px));margin:31px auto 40px}
+header{text-align:center;margin-bottom:32px}
+.logo{width:66px;height:66px;border-radius:21px;display:grid;place-items:center;background:linear-gradient(135deg,#7660ff,#8654ed);color:white;font-size:42px;margin:0 auto 22px;box-shadow:0 10px 22px #7560ff30}
+h1{font-size:42px;letter-spacing:-1.5px;margin:0 0 14px;font-weight:750}
+.subtitle{font-size:17px;color:#858ba4;margin:0}
+.panel{background:white;border:1px solid #e8e8f1;border-radius:26px;padding:28px;box-shadow:0 15px 45px #33334d08}
+.form{display:flex;gap:11px}
+#taskInput{flex:1;min-width:0;height:63px;padding:0 17px;border:1px solid #e0e3f0;border-radius:14px;font:17px Arial;color:#30334a;outline:none}
+#taskInput:focus{border-color:#7662ff}
+button{font-family:inherit;cursor:pointer}
+.add{border:0;border-radius:14px;background:#655ff5;color:white;padding:0 25px;font-size:17px;font-weight:700}
+.counts{display:flex;justify-content:space-between;color:#858ba4;font-size:14px;margin:28px 0 22px}
+.filters{display:flex;gap:8px;padding-bottom:20px;border-bottom:1px solid #ececf3}
+.filter{background:transparent;border:0;border-radius:12px;color:#777e98;font-size:14px;padding:12px 16px}
+.filter.active{background:#f0efff;color:#655cf2;font-weight:700}
+ul{list-style:none;margin:20px 0;padding:0}
+li{min-height:70px;display:flex;align-items:center;gap:15px;border:1px solid #e9eaf3;border-radius:15px;padding:14px 17px;margin-bottom:10px;background:white}
+li input[type=checkbox]{width:19px;height:19px;flex-shrink:0;accent-color:#655ff5;cursor:pointer}
+.task{flex:1;overflow-wrap:anywhere;font-size:16px;color:#29304a}
+li.done .task{text-decoration:line-through;color:#9298ac}
+.delete{border:0;background:transparent;color:#9299b0;font-size:24px;padding:0 3px}
+.empty{padding:24px 0;text-align:center;color:#9aa0b3;font-size:15px}
+.bottom{border-top:1px solid #ececf3;padding-top:30px;display:flex;align-items:center;justify-content:space-between;color:#7d86a3;font-size:14px}
+.clear{border:0;background:none;color:#7164f6;font-size:14px;padding:0}
+footer{text-align:center;color:#8a91aa;font-size:14px;margin-top:32px}
+@media(max-width:500px){.page{margin-top:25px}.panel{padding:18px}h1{font-size:36px}.add{padding:0 15px}#taskInput{font-size:14px}}
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>My Tasks ✨</h1>
-  <div class="subtitle">Organize your day, one task at a time.</div>
-
-  <form class="form" id="taskForm">
-    <input id="taskInput" placeholder="What needs to be done?" maxlength="200" required>
-    <button type="submit">+ Add Task</button>
-  </form>
-
-  <div class="stats">
-    <div class="stat"><strong id="total">0</strong><span>Total Tasks</span></div>
-    <div class="stat"><strong id="pending">0</strong><span>Pending</span></div>
-    <div class="stat"><strong id="completed">0</strong><span>Completed</span></div>
-  </div>
-
-  <div class="filters">
-    <button type="button" class="active" data-filter="all">All Tasks</button>
-    <button type="button" data-filter="pending">Pending</button>
-    <button type="button" data-filter="completed">Completed</button>
-  </div>
-
-  <ul id="taskList"></ul>
-  <div class="footer">Stay focused. You've got this! 💜</div>
-</div>
-
+<main class="page">
+<header>
+<div class="logo">✓</div>
+<h1>My Tasks</h1>
+<p class="subtitle">Plan your day. Make progress.</p>
+</header>
+<section class="panel">
+<form class="form" id="taskForm">
+<input id="taskInput" placeholder="What do you need to do?" maxlength="200" required>
+<button class="add" type="submit">+ Add</button>
+</form>
+<div class="counts"><span id="remaining">1 remaining</span><span id="completedCount">1 completed</span></div>
+<nav class="filters">
+<button class="filter active" data-filter="all" type="button">All</button>
+<button class="filter" data-filter="active" type="button">Active</button>
+<button class="filter" data-filter="completed" type="button">Completed</button>
+</nav>
+<ul id="taskList"></ul>
+<div class="bottom"><span id="total">2 total tasks</span><button class="clear" id="clearCompleted" type="button">Clear completed</button></div>
+</section>
+<footer>Small steps every day lead to big results.</footer>
+</main>
 <script>
-const form=document.getElementById('taskForm');
 const input=document.getElementById('taskInput');
+const form=document.getElementById('taskForm');
 const list=document.getElementById('taskList');
-let tasks=JSON.parse(localStorage.getItem('myTasks')||'[]');
+let tasks=[
+{id:1,text:'Learn React basics',done:false},
+{id:2,text:'Build my first application',done:true}
+];
 let filter='all';
-
 function render(){
-  list.replaceChildren();
-  const visible=tasks.filter(t=>filter==='all'||(filter==='completed'?t.done:!t.done));
-  if(!visible.length){
-    const empty=document.createElement('li');
-    empty.className='empty';
-    empty.textContent=tasks.length?'No tasks in this filter.':'No tasks yet. Add your first task!';
-    list.append(empty);
-  }
-  visible.forEach(t=>{
-    const li=document.createElement('li');
-    if(t.done)li.className='done';
-    const check=document.createElement('input');
-    check.type='checkbox';check.checked=t.done;
-    check.setAttribute('aria-label','Mark task complete');
-    check.addEventListener('change',()=>{
-      t.done=check.checked;save();
-    });
-    const text=document.createElement('span');
-    text.className='task';text.textContent=t.text;
-    const del=document.createElement('button');
-    del.className='delete';del.textContent='Delete';
-    del.addEventListener('click',()=>{
-      tasks=tasks.filter(x=>x.id!==t.id);save();
-    });
-    li.append(check,text,del);list.append(li);
-  });
-  document.getElementById('total').textContent=tasks.length;
-  document.getElementById('pending').textContent=tasks.filter(t=>!t.done).length;
-  document.getElementById('completed').textContent=tasks.filter(t=>t.done).length;
-  document.querySelectorAll('[data-filter]').forEach(b=>{
-    b.classList.toggle('active',b.dataset.filter===filter);
-  });
-}
-function save(){
-  localStorage.setItem('myTasks',JSON.stringify(tasks));render();
-}
-form.addEventListener('submit',e=>{
-  e.preventDefault();
-  const text=input.value.trim();
-  if(!text)return;
-  tasks.push({id:Date.now()+Math.random(),text,done:false});
-  input.value='';save();input.focus();
+list.replaceChildren();
+const visible=tasks.filter(t=>filter==='all'||(filter==='active'?!t.done:t.done));
+document.getElementById('remaining').textContent=tasks.filter(t=>!t.done).length+' remaining';
+document.getElementById('completedCount').textContent=tasks.filter(t=>t.done).length+' completed';
+document.getElementById('total').textContent=tasks.length+' total tasks';
+document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b.dataset.filter===filter));
+if(!visible.length){const e=document.createElement('li');e.className='empty';e.textContent='No tasks here.';list.append(e);}
+visible.forEach(t=>{
+const li=document.createElement('li');if(t.done)li.className='done';
+const c=document.createElement('input');c.type='checkbox';c.checked=t.done;c.setAttribute('aria-label','Complete task');
+c.addEventListener('change',()=>{t.done=c.checked;render();});
+const label=document.createElement('span');label.className='task';label.textContent=t.text;
+const d=document.createElement('button');d.className='delete';d.type='button';d.textContent='×';d.setAttribute('aria-label','Delete task');
+d.addEventListener('click',()=>{tasks=tasks.filter(x=>x.id!==t.id);render();});
+li.append(c,label,d);list.append(li);
 });
-document.querySelectorAll('[data-filter]').forEach(b=>{
-  b.addEventListener('click',()=>{filter=b.dataset.filter;render();});
-});
+}
+form.addEventListener('submit',e=>{e.preventDefault();const text=input.value.trim();if(!text)return;tasks.push({id:Date.now(),text,done:false});input.value='';render();});
+document.querySelectorAll('.filter').forEach(b=>b.addEventListener('click',()=>{filter=b.dataset.filter;render();}));
+document.getElementById('clearCompleted').addEventListener('click',()=>{tasks=tasks.filter(t=>!t.done);render();});
 render();
 </script>
 </body>
